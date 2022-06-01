@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Dry Clean Map Route</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="example_text">I\'m using Android Navigation Component for Navigation. I have a LoginFragment which has a button to transition to SignUpFragment. On clicking the button I\'m getting this error.</string>
+    <string name="login">Login</string>
+    <string name="welcome">Welcome</string>
+</resources>
