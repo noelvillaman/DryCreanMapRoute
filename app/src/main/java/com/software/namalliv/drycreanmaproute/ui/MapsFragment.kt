@@ -59,7 +59,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     }
 
     private fun setUIClickListeners() {
-        binding.bntStart.setOnClickListener { }
+        binding.bntStart.setOnClickListener {
+            onStartButtonClicked()
+        }
         binding.bntStop.setOnClickListener { }
         binding.btnReset.setOnClickListener { }
         binding.circle1.setOnClickListener {
