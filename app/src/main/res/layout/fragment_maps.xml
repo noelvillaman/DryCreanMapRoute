@@ -22,7 +22,9 @@
         android:text="@string/start"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="@android:color/holo_red_dark"
+        android:textSize="40sp"
         android:textStyle="bold"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/map"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,6 +35,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stop"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,9 +51,8 @@
         android:layout_marginBottom="24dp"
         android:backgroundTint="@color/black"
         android:text="@string/start"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/bnt_stop"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -62,9 +65,8 @@
         android:text="@string/stop"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/bnt_start"
-        app:layout_constraintEnd_toStartOf="@+id/btn_reset"
-        app:layout_constraintStart_toEndOf="@+id/bnt_start"
-        app:layout_constraintTop_toTopOf="@+id/bnt_start" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btn_reset"
@@ -78,8 +80,8 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/bnt_stop"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/bnt_stop"
-        app:layout_constraintTop_toTopOf="@+id/bnt_stop" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="gone" />
 
 
     <ImageView

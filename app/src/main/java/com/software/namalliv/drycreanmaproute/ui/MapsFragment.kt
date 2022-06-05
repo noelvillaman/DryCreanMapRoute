@@ -1,12 +1,16 @@
 package com.software.namalliv.drycreanmaproute.ui
 
+import android.content.Intent
+import android.graphics.Color.red
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -18,6 +22,10 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.software.namalliv.drycreanmaproute.R
 import com.software.namalliv.drycreanmaproute.databinding.FragmentMapsBinding
+import com.software.namalliv.drycreanmaproute.service.TrackerService
+import com.software.namalliv.drycreanmaproute.util.Constants.ACTION_SERVICE_START
+import com.software.namalliv.drycreanmaproute.util.Constants.ACTION_SERVICE_STOP
+import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.disable
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.hide
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.show
 import com.software.namalliv.drycreanmaproute.util.Permissions.hasBackgroundLocationPermission
@@ -110,9 +118,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     private fun onStartButtonClicked() {
         if (hasBackgroundLocationPermission(requireContext())) {
-            Log.d("MapsActivity", "Already Enabled")
+            startCountDown()
+            binding.bntStart.disable()
+            binding.bntStart.hide()
+            binding.bntStop.show()
         } else {
-            requestLocationPermission(this)
+            requestBackgroundLocationPermission(this)
         }
     }
 
@@ -145,5 +156,53 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             binding.bntStart.show()
         }
         return false
+    }
+
+    private fun startCountDown() {
+        binding.tvCounter.show()
+        binding.bntStop.disable()
+        val timer: CountDownTimer = object : CountDownTimer(4000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val currentSecond = millisUntilFinished / 1000
+                if (currentSecond.toString() == "0") {
+                    binding.tvCounter.text = "GO"
+                    binding.tvCounter.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.black
+                        )
+                    )
+                } else {
+                    binding.tvCounter.text = currentSecond.toString()
+                    binding.tvCounter.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.error_400
+                        )
+                    )
+                }
+            }
+
+            override fun onFinish() {
+                sendActionCommandToService(ACTION_SERVICE_START)
+                binding.tvCounter.hide()
+            }
+        }
+        timer.start()
+    }
+
+    private fun stopForegroundService() {
+        binding.bntStart.disable()
+        sendActionCommandToService(ACTION_SERVICE_STOP)
+    }
+
+    private fun sendActionCommandToService(action: String) {
+        Intent(
+            requireContext(),
+            TrackerService::class.java
+        ).apply {
+            this.action = action
+            requireContext().startService(this)
+        }
     }
 }

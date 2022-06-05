@@ -28,7 +28,7 @@ object Permissions {
     }
 
     fun hasBackgroundLocationPermission(context: Context):Boolean{
-        if (Build.VERSION.SDK_INT> Q){
+        if (Build.VERSION.SDK_INT >= Q){
             return EasyPermissions.hasPermissions(
                 context,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
@@ -38,7 +38,7 @@ object Permissions {
     }
 
     fun requestBackgroundLocationPermission(fragment: Fragment){
-        if (Build.VERSION.SDK_INT> Q){
+        if (Build.VERSION.SDK_INT >= Q){
             return EasyPermissions.requestPermissions(
                 fragment,
                 "We need this",
