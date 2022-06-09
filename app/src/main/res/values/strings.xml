@@ -6,5 +6,6 @@
     <string name="welcome">Welcome</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="location">Tab my location button\n to find me.</string>
     <string name="reset">Reset</string>
 </resources>

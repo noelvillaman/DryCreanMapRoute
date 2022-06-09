@@ -1,6 +1,7 @@
 package com.software.namalliv.drycreanmaproute.ui
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Color.red
 import androidx.fragment.app.Fragment
 
@@ -17,9 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.software.namalliv.drycreanmaproute.R
 import com.software.namalliv.drycreanmaproute.databinding.FragmentMapsBinding
 import com.software.namalliv.drycreanmaproute.service.TrackerService
@@ -28,20 +27,25 @@ import com.software.namalliv.drycreanmaproute.util.Constants.ACTION_SERVICE_STOP
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.disable
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.hide
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.show
+import com.software.namalliv.drycreanmaproute.util.MapUtil.setCameraPosition
 import com.software.namalliv.drycreanmaproute.util.Permissions.hasBackgroundLocationPermission
 import com.software.namalliv.drycreanmaproute.util.Permissions.requestBackgroundLocationPermission
 import com.software.namalliv.drycreanmaproute.util.Permissions.requestLocationPermission
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.lang.Exception
 
+
 class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     EasyPermissions.PermissionCallbacks {
 
     private var _bindding: FragmentMapsBinding? = null
     private val binding get() = _bindding!!
+
+    private var locationList = mutableListOf<LatLng>()
 
     private lateinit var map: GoogleMap
 
@@ -93,6 +97,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             isZoomControlsEnabled = false
         }
         changeMapStyle(map)
+        observeTrackerService()
+    }
+
+    private fun observeTrackerService(){
+        TrackerService.locationList.observe(viewLifecycleOwner) {
+            if (it != null) {
+                locationList = it
+                drawPolyline()
+                followPolyline()
+            }
+        }
     }
 
     private fun changeMapStyle(googleMap: GoogleMap) {
@@ -203,6 +218,29 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         ).apply {
             this.action = action
             requireContext().startService(this)
+        }
+    }
+
+    private fun drawPolyline(){
+        val polyline = map.addPolyline(
+            PolylineOptions().apply {
+                width(10f)
+                color(Color.BLUE)
+                jointType(JointType.ROUND)
+                startCap(ButtCap())
+                endCap(ButtCap())
+                addAll(locationList)
+            }
+        )
+    }
+
+    private fun followPolyline(){
+        if (locationList.isNotEmpty()){
+            map.animateCamera(
+                (CameraUpdateFactory.newCameraPosition(
+                    setCameraPosition(locationList.last())
+                )), 1000, null
+            )
         }
     }
 }
