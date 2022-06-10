@@ -4,4 +4,8 @@
     <string name="example_text">I\'m using Android Navigation Component for Navigation. I have a LoginFragment which has a button to transition to SignUpFragment. On clicking the button I\'m getting this error.</string>
     <string name="login">Login</string>
     <string name="welcome">Welcome</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="location">Tab my location button\n to find me.</string>
+    <string name="reset">Reset</string>
 </resources>
