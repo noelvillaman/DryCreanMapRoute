@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_LOW
 import android.content.ContentProviderClient
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Build
@@ -28,6 +29,8 @@ import javax.inject.Inject
 class TrackerService : LifecycleService(){
     companion object {
         val started = MutableLiveData<Boolean>()
+        val startTime = MutableLiveData<Long>()
+        val stopTime = MutableLiveData<Long>()
 
         val locationList = MutableLiveData<MutableList<LatLng>>()
     }
@@ -35,7 +38,7 @@ class TrackerService : LifecycleService(){
     private val locationCallback = object : LocationCallback(){
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
-            result?.locations?.let { locations ->
+            result.locations.let { locations ->
                 for (location in locations){
                     updateLocationList(location)
                 }
@@ -53,6 +56,8 @@ class TrackerService : LifecycleService(){
 
     private fun setInitialValue(){
         started.postValue(false)
+        startTime.postValue(0L)
+        stopTime.postValue(0L)
 
         //create an empty list
         locationList.postValue(mutableListOf())
@@ -81,6 +86,7 @@ class TrackerService : LifecycleService(){
                 }
                 ACTION_SERVICE_STOP -> {
                     started.postValue(false)
+                    stopForegroundService()
                 }
                 else -> {}
             }
@@ -93,6 +99,20 @@ class TrackerService : LifecycleService(){
         startForeground(NOTIFICATION_ID, notification.build())
     }
 
+    private fun stopForegroundService(){
+        removeLocationUpdates()
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(
+            NOTIFICATION_ID
+        )
+        stopForeground(true)
+        stopSelf()
+        startTime.postValue(System.currentTimeMillis())
+    }
+
+    private fun removeLocationUpdates(){
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
     private fun startLocationUpdates(){
         val locationRequest = LocationRequest().apply {
             interval = LOCATION_UPDATE_INTERVAL
@@ -102,9 +122,9 @@ class TrackerService : LifecycleService(){
         fusedLocationProviderClient.requestLocationUpdates(
             locationRequest,
             locationCallback,
-            Looper.getMainLooper()
+            Looper.getMainLooper())
 
-        )
+        startTime.postValue(System.currentTimeMillis())
     }
 
     private fun createNotificationChannel(){

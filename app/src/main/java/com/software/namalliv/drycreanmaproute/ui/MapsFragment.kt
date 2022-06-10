@@ -25,6 +25,7 @@ import com.software.namalliv.drycreanmaproute.service.TrackerService
 import com.software.namalliv.drycreanmaproute.util.Constants.ACTION_SERVICE_START
 import com.software.namalliv.drycreanmaproute.util.Constants.ACTION_SERVICE_STOP
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.disable
+import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.enable
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.hide
 import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.show
 import com.software.namalliv.drycreanmaproute.util.MapUtil.setCameraPosition
@@ -48,6 +49,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private var locationList = mutableListOf<LatLng>()
 
     private lateinit var map: GoogleMap
+
+    private var startTime = 0L
+    private var stopTime = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,7 +78,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         binding.bntStart.setOnClickListener {
             onStartButtonClicked()
         }
-        binding.bntStop.setOnClickListener { }
+        binding.bntStop.setOnClickListener {
+            onStopBntClicked()
+        }
         binding.btnReset.setOnClickListener { }
         binding.circle1.setOnClickListener {
             requireActivity().finish()
@@ -104,10 +110,38 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         TrackerService.locationList.observe(viewLifecycleOwner) {
             if (it != null) {
                 locationList = it
+                if (locationList.size > 1){
+                    binding.bntStop.enable()
+                }
                 drawPolyline()
                 followPolyline()
             }
         }
+
+        TrackerService.startTime.observe(viewLifecycleOwner) {
+            startTime = it
+        }
+
+        TrackerService.stopTime.observe(viewLifecycleOwner) {
+            stopTime = it
+            if(stopTime != 0L){
+                showBiggerPicture()
+            }
+        }
+    }
+
+    private fun showBiggerPicture() {
+        val bounds = LatLngBounds.Builder()
+        for (location in locationList) {
+            bounds.include(location)
+        }
+        map.animateCamera(
+            CameraUpdateFactory.newLatLngBounds(
+                bounds.build(), 100
+            ), 2000, null
+        )
+//        addMarker(locationList.first())
+//        addMarker(locationList.last())
     }
 
     private fun changeMapStyle(googleMap: GoogleMap) {
@@ -224,8 +258,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
     private fun drawPolyline(){
         val polyline = map.addPolyline(
             PolylineOptions().apply {
-                width(10f)
-                color(Color.BLUE)
+                width(30f)
+                color(Color.RED)
                 jointType(JointType.ROUND)
                 startCap(ButtCap())
                 endCap(ButtCap())
@@ -242,5 +276,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
                 )), 1000, null
             )
         }
+    }
+
+    private fun onStopBntClicked(){
+        stopForegroundService()
+        binding.bntStop.hide()
+        binding.bntStart.show()
     }
 }
