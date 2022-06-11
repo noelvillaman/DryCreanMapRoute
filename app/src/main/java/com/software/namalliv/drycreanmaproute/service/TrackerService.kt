@@ -106,7 +106,7 @@ class TrackerService : LifecycleService(){
         )
         stopForeground(true)
         stopSelf()
-        startTime.postValue(System.currentTimeMillis())
+        stopTime.postValue(System.currentTimeMillis())
     }
 
     private fun removeLocationUpdates(){

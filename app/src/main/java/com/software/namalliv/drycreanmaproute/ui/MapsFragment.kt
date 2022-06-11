@@ -2,7 +2,6 @@ package com.software.namalliv.drycreanmaproute.ui
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Color.red
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
@@ -12,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,8 +31,6 @@ import com.software.namalliv.drycreanmaproute.util.ExtensionsFunctions.show
 import com.software.namalliv.drycreanmaproute.util.MapUtil.setCameraPosition
 import com.software.namalliv.drycreanmaproute.util.Permissions.hasBackgroundLocationPermission
 import com.software.namalliv.drycreanmaproute.util.Permissions.requestBackgroundLocationPermission
-import com.software.namalliv.drycreanmaproute.util.Permissions.requestLocationPermission
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
@@ -43,10 +41,11 @@ import java.lang.Exception
 class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
     EasyPermissions.PermissionCallbacks {
 
-    private var _bindding: FragmentMapsBinding? = null
-    private val binding get() = _bindding!!
+    private var _binding: FragmentMapsBinding? = null
+    private val binding get() = _binding!!
 
     private var locationList = mutableListOf<LatLng>()
+    val started = MutableLiveData(false)
 
     private lateinit var map: GoogleMap
 
@@ -58,7 +57,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _bindding = FragmentMapsBinding.inflate(inflater, container, false)
+        _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = this
+        binding.tracking = this
         return binding.root
     }
 
@@ -66,6 +67,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
+//_binding
 
         init()
     }
@@ -118,16 +120,24 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
             }
         }
 
+        TrackerService.started.observe(viewLifecycleOwner){
+            started.value = it
+        }
+
         TrackerService.startTime.observe(viewLifecycleOwner) {
             startTime = it
+            Log.d("TIME", "StartTime --> ${startTime}")
         }
 
         TrackerService.stopTime.observe(viewLifecycleOwner) {
             stopTime = it
+            Log.d("TIME", "StopTime --> ${stopTime}")
             if(stopTime != 0L){
                 showBiggerPicture()
             }
         }
+
+
     }
 
     private fun showBiggerPicture() {
@@ -162,7 +172,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMyLocationButto
 
     override fun onDestroy() {
         super.onDestroy()
-        _bindding = null
+        _binding = null
     }
 
     private fun onStartButtonClicked() {
