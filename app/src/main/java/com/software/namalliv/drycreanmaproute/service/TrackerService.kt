@@ -22,6 +22,7 @@ import com.software.namalliv.drycreanmaproute.util.Constants.LOCATION_UPDATE_INT
 import com.software.namalliv.drycreanmaproute.util.Constants.NOTIFICATION_CHANNEL_ID
 import com.software.namalliv.drycreanmaproute.util.Constants.NOTIFICATION_CHANNEL_NAME
 import com.software.namalliv.drycreanmaproute.util.Constants.NOTIFICATION_ID
+import com.software.namalliv.drycreanmaproute.util.MapUtil.calculateTheDistance
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -41,6 +42,7 @@ class TrackerService : LifecycleService(){
             result.locations.let { locations ->
                 for (location in locations){
                     updateLocationList(location)
+                    updateNotificationPeriodically()
                 }
             }
         }
@@ -136,6 +138,14 @@ class TrackerService : LifecycleService(){
             )
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    private fun updateNotificationPeriodically() {
+        notification.apply {
+            setContentTitle("Distance Travelled")
+            setContentText(locationList.value?.let { calculateTheDistance(it) } + "km")
+        }
+        notificationManager.notify(NOTIFICATION_ID, notification.build())
     }
 
 }

@@ -1,17 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dry Clean Map Route</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="example_text">I\'m using Android Navigation Component for Navigation. I have a LoginFragment which has a button to transition to SignUpFragment. On clicking the button I\'m getting this error.</string>
-    <string name="login">Login</string>
-    <string name="welcome">Welcome</string>
-    <string name="start">Start</string>
-    <string name="stop">Stop</string>
+    <string name="login">Acceder</string>
+    <string name="welcome">Bienvenido</string>
+    <string name="start">Comenzar</string>
+    <string name="stop">Parar</string>
     <string name="location">Tab my location button\n to find me.</string>
     <string name="reset">Reset</string>
     <string name="share">Share</string>
     <string name="_00_00_00">00:00:00</string>
-    <string name="time">Time</string>
+    <string name="time">Tiempo</string>
     <string name="_0_0km">0.0km</string>
-    <string name="distance">Ditance</string>
+    <string name="distance">Ditancia</string>
     <string name="result">%1$s km</string>
 </resources>
